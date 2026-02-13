@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Motorista</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body { font-family: Arial; padding: 20px; background:#f2f2f2 }
+.card{ background:white;padding:15px;margin-bottom:10px;border-radius:10px }
+button{ padding:10px;margin-top:5px;border:none;border-radius:8px }
+.aceitar{ background:blue;color:white }
+.finalizar{ background:green;color:white }
+</style>
+</head>
+<body>
+
+<h2>🚕 Motorista</h2>
+<div id="lista"></div>
+
+<script>
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBuNjHAdtiStrLd9P_zCm3vIZlymjkRkrs",
+  authDomain: "transportes-robs.firebaseapp.com",
+  databaseURL: "https://transportes-robs-default-rtdb.firebaseio.com",
+  projectId: "transportes-robs",
+  storageBucket: "transportes-robs.firebasestorage.app",
+  messagingSenderId: "749205965953",
+  appId: "1:749205965953:web:88c3906539a640619a1180"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const lista = document.getElementById("lista");
+
+db.ref("corridas").on("value", (snap) => {
+  lista.innerHTML = "";
+  snap.forEach((child) => {
+    const dados = child.val();
+    const id = child.key;
+
+    if(dados.status === "procurando"){
+      lista.innerHTML += `
+        <div class="card">
+          Passageiro: ${dados.nome}<br>
+          Status: ${dados.status}<br>
+          <button class="aceitar" onclick="aceitar('${id}')">Aceitar</button>
+        </div>
+      `;
+    }
+  });
+});
+
+function aceitar(id){
+  db.ref("corridas/" + id).update({
+    status:"aceita"
+  });
+}
+
+</script>
+
+</body>
+</html>

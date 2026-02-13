@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Passageiro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body { font-family: Arial; padding: 20px; background:#f2f2f2 }
+button { padding:15px; width:100%; margin-top:10px; border:none; border-radius:10px; font-size:18px }
+.chamar{ background:green;color:white }
+.cancelar{ background:red;color:white }
+.status{ margin-top:15px;padding:10px;background:white;border-radius:10px }
+</style>
+</head>
+<body>
+
+<h2>🚗 Passageiro</h2>
+
+<input id="nome" placeholder="Seu nome" style="width:100%;padding:10px">
+
+<button class="chamar" onclick="chamar()">Chamar Motorista</button>
+<button class="cancelar" onclick="cancelar()">Cancelar</button>
+
+<div class="status" id="status">Aguardando...</div>
+
+<script>
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBuNjHAdtiStrLd9P_zCm3vIZlymjkRkrs",
+  authDomain: "transportes-robs.firebaseapp.com",
+  databaseURL: "https://transportes-robs-default-rtdb.firebaseio.com",
+  projectId: "transportes-robs",
+  storageBucket: "transportes-robs.firebasestorage.app",
+  messagingSenderId: "749205965953",
+  appId: "1:749205965953:web:88c3906539a640619a1180"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let corridaId = null;
+
+function chamar() {
+  const nome = document.getElementById("nome").value;
+  if(!nome) return alert("Digite seu nome");
+
+  const novaCorrida = db.ref("corridas").push();
+
+  novaCorrida.set({
+    nome: nome,
+    status: "procurando",
+    criadaEm: Date.now()
+  });
+
+  corridaId = novaCorrida.key;
+
+  db.ref("corridas/" + corridaId).on("value", (snap) => {
+    const dados = snap.val();
+    if(dados) {
+      document.getElementById("status").innerHTML =
+        "Status: " + dados.status;
+    }
+  });
+}
+
+function cancelar(){
+  if(corridaId){
+    db.ref("corridas/" + corridaId).update({
+      status:"cancelada"
+    });
+  }
+}
+
+</script>
+
+</body>
+</html>
